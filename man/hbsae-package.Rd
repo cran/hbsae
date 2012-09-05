@@ -1,0 +1,23 @@
+\docType{package}
+\name{hbsae-package}
+\alias{hbsae}
+\alias{hbsae-package}
+\title{A package for hierarchical Bayesian small area estimation.}
+\description{
+  Package hbsae provides functions to compute small area
+  estimates based on the basic unit-level and area-level
+  models. The models are fit and small area estimates are
+  computed in a hierarchical Bayesian way, using numerical
+  integration.
+}
+\details{
+  The main function that does most of the computational
+  work is \code{\link{fSAE.Unit}}. Function
+  \code{\link{fSAE}} is provided as a more convenient
+  interface to \code{\link{fSurvReg}},
+  \code{\link{fSAE.Area}} and \code{\link{fSAE.Unit}}.
+}
+\author{
+  Harm Jan Boonstra \email{hjboonstra@gmail.com}
+}
+

@@ -1,0 +1,184 @@
+\name{fSAE.Unit}
+\alias{fSAE.Unit}
+\title{Compute small area estimates based on the basic unit-level model.}
+\usage{
+  fSAE.Unit(y, X, area, Narea = NULL, Xpop = NULL,
+    fpc = TRUE, v = NULL, vpop = NULL, w = NULL,
+    wpop = NULL, method = "HB", beta0 = rep(0, ncol(X)),
+    Omega0 = Diagonal(n = ncol(X), x = 0), nu0 = 0,
+    s20 = 0, prior = function(x) rep.int(1L, length(x)),
+    CV = TRUE, CVweights = NULL, silent = FALSE,
+    keep.data = FALSE, full.cov = nrow(Xpop) < 1000,
+    lambda0 = NULL, rel.int.tol = 0.01, ...)
+}
+\arguments{
+  \item{y}{response vector of length n.}
+
+  \item{X}{n x p model matrix.}
+
+  \item{area}{n-vector of area codes, typically a factor
+  variable with m levels, where m is the number of sampled
+  areas.}
+
+  \item{Narea}{M-vector of area population sizes, where M
+  is the number of areas for which estimates are required.
+  There should be a ono-to-one correspondence with the rows
+  of \code{Xpop}.  This argument is required unless
+  \code{Xpop=NULL} or \code{fpc=FALSE}.}
+
+  \item{Xpop}{M x p matrix of population means. If
+  \code{Xpop} is not provided, only the model fit is
+  returned.}
+
+  \item{fpc}{whether a finite population correction should
+  be used. Default is \code{TRUE}.}
+
+  \item{v}{unit-level variance structure, n-vector.
+  Defaults to a vector of 1s. In some cases it might be
+  useful to take v proportional to the sampling
+  probabilities.}
+
+  \item{vpop}{population area means of v, M-vector.
+  Defaults to a vector of 1s. Not used when \code{fpc} is
+  \code{FALSE}.}
+
+  \item{w}{area-level variance structure, m-vector.
+  Defaults to a vector of 1s.}
+
+  \item{wpop}{area-level variance structure, M-vector.
+  Defaults to a vector of 1s.  Only components of
+  \code{wpop} corresponding to out-of-sample areas are
+  actually used.}
+
+  \item{method}{one of "HB", "hybrid", "REML", "synthetic",
+  "survreg", "BLUP" where "HB" (default) does the full
+  hierarchical Bayes computation, i.e. numerical
+  integration over the posterior density for the between
+  area variance parameter, "hybrid" computes the Best
+  Linear Unbiased Predictor (BLUP) with the posterior mean
+  for the variance parameter plugged in, "REML" computes
+  the BLUP with the restricted maximum likelihood estimate
+  of the variance parameter plugged in, "synthetic"
+  computes synthetic estimates where the between area
+  variance is set to 0, and "survreg" computes survey
+  regression estimates where the between area variance
+  approaches infinity.  "BLUP" computes BLUP estimates with
+  the value provided for \code{lambda0} as a fixed plug-in
+  value for the ratio of between and within area variance.
+  Only method "HB" takes uncertainty about the between-area
+  variance into account.}
+
+  \item{beta0}{mean vector of normal prior for coefficient
+  vector.}
+
+  \item{Omega0}{inverse covariance matrix of normal prior
+  for coefficient vector. Default prior corresponds to the
+  (improper) uniform distribution.}
+
+  \item{nu0}{degrees of freedom parameter for inverse gamma
+  prior for residual (within-area) variance. Default is 0.}
+
+  \item{s20}{scale parameter for inverse gamma prior for
+  residual (within-area) variance. Default is 0.}
+
+  \item{prior}{prior density for the ratio lambda =
+  between-area-variance / within-area variance. This should
+  be a (vectorized) function that takes a vector lambda and
+  returns a vector of prior density values at lambda. The
+  density does not have to be normalized. The default is
+  the (improper) uniform prior. The within-area variance
+  and lambda are assumed independent a priori.}
+
+  \item{CV}{whether leave-one-out cross-validation and
+  other model selection measures should be computed.
+  Default \code{TRUE}.}
+
+  \item{CVweights}{n-vector of weights to use for CV
+  computation.}
+
+  \item{silent}{if \code{FALSE}, plot the posterior density
+  for the variance ratio.}
+
+  \item{keep.data}{if \code{TRUE} return the input data
+  (y,X,area,Xpop).  This is required input for the
+  cross-validation function \code{CVArea}.}
+
+  \item{full.cov}{if \code{TRUE} compute the full
+  covariance matrix for the small area estimates.  The
+  computed correlations do not account for uncertainty
+  about the variance ratio.}
+
+  \item{lambda0}{optional starting value for the ratio of
+  between and within-area variance used in the numerical
+  routines.  If \code{method="BLUP"} then this value will
+  instead be used as a fixed plug-in value.}
+
+  \item{rel.int.tol}{tolerance for the estimated relative
+  integration error (default is 1 percent).  A warning is
+  issued if the estimated relative error exceeds this
+  value.}
+
+  \item{...}{additional control parameters passed to
+  function \code{integrate}.}
+}
+\value{
+  An object of class \code{sae} containing the small area
+  estimates and MSEs, the model fit, and model selection
+  measures.
+}
+\description{
+  This is the function that carries out most of the
+  computational work. It computes small area estimates
+  based on the basic unit-level model, also known as the
+  Battese-Harter-Fuller model, although it is also called
+  by \code{\link{fSurvReg}} and \code{\link{fSAE.Area}} to
+  compute survey regression or area-level model small area
+  estimates. By default, Hierarchical Bayes estimates are
+  computed, using fast one-dimensional numerical
+  integration to average over the posterior density for the
+  ratio of between and within area variance. This way, the
+  small area estimates and MSEs account for the uncertainty
+  about this parameter. Besides hierarchical Bayes, REML
+  and hybrid methods are supported. These methods use the
+  REML estimate or posterior mean of the variance ratio,
+  respectively, as a plug-in estimate. Both methods do not
+  account for uncertainty about this parameter. Synthetic
+  estimates are computed by setting the variance ratio to
+  zero.
+}
+\details{
+  The default Hierarchical Bayes method uses numerical
+  integration (as provided by function
+  \code{\link{integrate}}) to compute small area estimates
+  and MSEs. The model parameters returned, such as fixed
+  and random effects, are currently not averaged over the
+  posterior distribution for the variance ratio. They are
+  evaluated at the posterior mean of the variance ratio.
+}
+\examples{
+d <- generateFakeData()
+
+# generate design matrix, variable of interest, area indicator and population data
+dat <- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop, type="data")
+
+# compute small area estimates based on the basic unit-level model
+sae <- fSAE.Unit(dat$y, dat$X, dat$area, dat$Narea, dat$PopMeans)
+EST(sae)  # estimates
+SE(sae)  # standard errors
+}
+\references{
+  G.E. Battese, R.M. Harter and W.A. Fuller (1988).  An
+  Error-Components Model for Prediction of County Crop
+  Areas Using Survey and Satellite Data.  Journal of the
+  American Statistical Association, 83(401), 28-36.
+
+  G.S. Datta and M. Ghosh (1991). Bayesian Prediction in
+  Linear Models: Applications to Small Area Estimation.
+  The Annals of Statistics 19(4), 1748-1770.
+
+  J.N.K. Rao (2003). Small Area Estimation. Wiley.
+}
+\seealso{
+  \code{\link{sae-class}}
+}
+

@@ -1,0 +1,19 @@
+\name{summary.weights}
+\alias{summary.weights}
+\title{Summary method for objects of class \code{weights}.}
+\usage{
+  \method{summary}{weights} (object, ...)
+}
+\arguments{
+  \item{object}{object of class \code{weights} as returned
+  by function \code{\link{uweights}}.}
+
+  \item{...}{not used.}
+}
+\description{
+  Summary method for objects of class \code{weights}.
+}
+\seealso{
+  \code{\link{uweights}}, \code{\link{plot.weights}}
+}
+

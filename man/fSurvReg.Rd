@@ -1,0 +1,70 @@
+\name{fSurvReg}
+\alias{fSurvReg}
+\title{Compute small area estimates based on the survey regression estimator.}
+\usage{
+  fSurvReg(y, X, area, Narea, Xpop, removeEmpty = TRUE,
+    ...)
+}
+\arguments{
+  \item{y}{response vector of length n.}
+
+  \item{X}{n x p model matrix.}
+
+  \item{area}{n-vector of area codes, typically a factor
+  variable with m levels, where m is the number of sampled
+  areas.}
+
+  \item{Narea}{M-vector of area population sizes.}
+
+  \item{Xpop}{M x p matrix of population means.}
+
+  \item{removeEmpty}{whether out-of-sample areas should be
+  removed from the results. If \code{FALSE} these areas are
+  retained in the vectors of estimates, but they will have
+  (relatively) very large standard errors.}
+
+  \item{...}{optional arguments v and vpop passed to
+  \code{\link{fSAE.Unit}}.}
+}
+\value{
+  An object of class \code{sae} containing the survey
+  regression small area estimates and their estimated
+  variances.
+}
+\description{
+  This function computes survey regression estimates as a
+  special case of unit-level model small area estimates
+  with a (relatively) very large value for the between-area
+  variance but without including area effects in the model
+  fit. The model assumes a single overall variance
+  parameter, so that the resulting estimated variances are
+  not area-specific but smoothed. Varying inclusion
+  probabilities may be taken into account by including them
+  in the model, e.g. as an additional covariate, and/or as
+  model variance structure by specifying arguments v and
+  vpop, see \code{\link{fSAE.Unit}}. The resulting
+  estimates may be used as input estimates for area-level
+  model small area estimation.
+}
+\examples{
+d <- generateFakeData()
+
+# generate design matrix, variable of interest, area indicator and population data
+dat <- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop, type="data")
+
+sae <- fSurvReg(dat$y, dat$X, dat$area, dat$Narea, dat$PopMeans)
+EST(sae)  # estimates
+SE(sae)  # standard errors
+}
+\references{
+  G.E. Battese, R.M. Harter and W.A. Fuller (1988).  An
+  Error-Components Model for Prediction of County Crop
+  Areas Using Survey and Satellite Data.  Journal of the
+  American Statistical Association, 83(401), 28-36.
+
+  J.N.K. Rao (2003). Small Area Estimation. Wiley.
+}
+\seealso{
+  \code{\link{sae-class}}
+}
+
