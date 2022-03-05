@@ -1,0 +1,21 @@
+
+version 1.2
+- fixed all CRAN check NOTES of old version 1.0
+- new argument 'tot' for functions EST, MSE, RMSE; if TRUE, estimates for
+  totals instead of means are returned
+- benchmarking function 'bench' has been generalized to handle both soft
+  and hard constraints
+- fSAE.Area now uses a one-column matrix of 1s as a default covariate
+  matrix X
+- cAIC is now computed even if CV=FALSE (now the default), using a
+  more memory-efficient computation of the trace of the hat matrix
+- multivariate integration wrapper around 'integrate' is now a separate
+  function
+- updated plot.sae method and removed dependency on package arm
+- added several unit tests, using package testthat
+- improvements to documentation and error/diagnostic messages
+- small bug fixes and code improvements
+
+
+version 1.0
+- initial CRAN release

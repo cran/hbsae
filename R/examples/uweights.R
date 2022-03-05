@@ -1,7 +1,8 @@
 d <- generateFakeData()
 
 # compute small area estimates
-sae <- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop, method="hybrid", keep.data=TRUE)
+sae <- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop,
+            method="hybrid", keep.data=TRUE)
 
 # compute unit weights
 w <- uweights(sae, forTotal=TRUE)
